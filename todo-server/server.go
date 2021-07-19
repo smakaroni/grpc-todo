@@ -149,7 +149,7 @@ func main() {
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
-		log.Fatalf("mongo db error %v\n", err)
+		log.Fatalf("mongo db erros %v\n", err)
 	}
 	defer func() {
 		if err = client.Disconnect(ctx); err != nil {
