@@ -20,6 +20,39 @@ import (
 
 type server struct{}
 
+func (s server) CompleteTodo(ctx context.Context, request *todopb.CompleteTodoRequest) (*todopb.CompleteTodoResponse, error) {
+	oid, err := primitive.ObjectIDFromHex(request.GetTodo().GetId())
+	if err != nil {
+		return nil, status.Errorf(
+			codes.Internal,
+			fmt.Sprintf("Invalid argument %v\n"))
+	}
+
+	filter := primitive.M{"_id": oid}
+	data := &todopb.Todo{}
+	res := collection.FindOne(nil, filter)
+
+	if err := res.Decode(data); err != nil {
+		return nil, status.Errorf(
+			codes.NotFound,
+			fmt.Sprintf("todo not found %v\n", err))
+	}
+
+	data.Complete = true
+
+	_, updErr := collection.ReplaceOne(nil, filter, data)
+	if updErr != nil {
+		return nil, status.Errorf(
+			codes.Internal,
+			fmt.Sprintf("error updating todo %v\n", err))
+	}
+
+	return &todopb.CompleteTodoResponse{
+		Id:      data.Id,
+		Message: fmt.Sprintf("%v set to completed", data.Title),
+	}, nil
+}
+
 func (s server) DeleteTodo(ctx context.Context, request *todopb.DeleteTodoRequest) (*todopb.DeleteTodoResponse, error) {
 	fmt.Printf("Delete todo %v\n", request.GetTodo().Title)
 	oid, err := primitive.ObjectIDFromHex(request.GetTodo().GetId())
