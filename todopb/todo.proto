@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package todo;
+
+option go_package = "/todopb";
+
+import "google/protobuf/timestamp.proto";
+
+message Todo {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+    bool complete = 4;
+    string status = 5;
+    google.protobuf.Timestamp deadline = 6;
+
+}
+
+service TodoService {
+    rpc CreateTodo(CreateTodoRequest) returns (CreateTodoResponse);
+    rpc CreateTodos(CreateTodosRequest) returns (CreateTodosResponse);
+    rpc ListTodo(ListTodoRequest) returns(ListTodoResponse);
+    rpc DeleteTodo(DeleteTodoRequest) returns(DeleteTodoResponse);
+}
+
+message CreateTodoRequest{
+    Todo todo = 1;
+}
+
+message CreateTodoResponse {
+    string id = 1;
+}
+
+message CreateTodosRequest {
+    repeated Todo todos = 1;
+}
+
+message CreateTodosResponse {
+    repeated string id = 1;
+}
+
+message ListTodoRequest {
+    int32 limit = 1;
+    bool not_completed = 2;
+}
+
+message ListTodoResponse {
+    repeated Todo todos = 1;
+}
+
+message DeleteTodoRequest {
+    Todo todo = 1;
+}
+
+message DeleteTodoResponse {
+    Todo todos = 1;
+}
